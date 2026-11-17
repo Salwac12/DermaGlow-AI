@@ -1,13 +1,135 @@
 # ==========================================================
 # DERMAGLOW AI - DATABASE
 # Developer: Salwa Choudhari
+#
+# Local: SQLite
+# Vercel: Neon PostgreSQL
 # ==========================================================
 
+import os
+import re
 import sqlite3
+
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+
+# ==========================================================
+# ENVIRONMENT CONFIGURATION
+# ==========================================================
+
 BASE_DIR = Path(__file__).resolve().parent
+
+load_dotenv(BASE_DIR / ".env")
+
 DATABASE = BASE_DIR / "dermaglow.db"
+
+IS_VERCEL = os.environ.get("VERCEL") == "1"
+
+
+# ==========================================================
+# POSTGRESQL SQL COMPATIBILITY
+# ==========================================================
+
+def convert_sql_for_postgres(query):
+
+    # SQLite uses DATE('now').
+    # Our migrated date columns are stored as text.
+
+    query = re.sub(
+        r"DATE\s*\(\s*'now'\s*\)",
+        "CURRENT_DATE::text",
+        query,
+        flags=re.IGNORECASE
+    )
+
+    # SQLite's NOCASE collation is not generally
+    # available in PostgreSQL.
+    #
+    # Preserve case-insensitive product ordering.
+
+    query = re.sub(
+        r"\bproduct_name\s+COLLATE\s+NOCASE\b",
+        "LOWER(product_name)",
+        query,
+        flags=re.IGNORECASE
+    )
+
+    # Remove any remaining SQLite NOCASE clauses.
+
+    query = re.sub(
+        r"\s+COLLATE\s+NOCASE\b",
+        "",
+        query,
+        flags=re.IGNORECASE
+    )
+
+    # SQLite LIKE is case-insensitive for ASCII
+    # by default. PostgreSQL uses ILIKE.
+
+    query = re.sub(
+        r"\bLIKE\b",
+        "ILIKE",
+        query,
+        flags=re.IGNORECASE
+    )
+
+    # SQLite uses ? placeholders.
+    # psycopg2 uses %s placeholders.
+
+    query = query.replace("?", "%s")
+
+    return query
+
+
+# ==========================================================
+# POSTGRESQL CONNECTION WRAPPER
+# ==========================================================
+
+class PostgresConnection:
+
+    def __init__(self, connection):
+
+        self.connection = connection
+
+    def execute(self, query, parameters=None):
+
+        from psycopg2.extras import RealDictCursor
+
+        converted_query = convert_sql_for_postgres(
+            query
+        )
+
+        cursor = self.connection.cursor(
+            cursor_factory=RealDictCursor
+        )
+
+        try:
+
+            cursor.execute(
+                converted_query,
+                tuple(parameters or ())
+            )
+
+            return cursor
+
+        except Exception:
+
+            cursor.close()
+            raise
+
+    def commit(self):
+
+        self.connection.commit()
+
+    def rollback(self):
+
+        self.connection.rollback()
+
+    def close(self):
+
+        self.connection.close()
 
 
 # ==========================================================
@@ -16,33 +138,105 @@ DATABASE = BASE_DIR / "dermaglow.db"
 
 def get_db_connection():
 
-    conn = sqlite3.connect(
+    # ------------------------------------------
+    # VERCEL: NEON POSTGRESQL
+    # ------------------------------------------
+
+    if IS_VERCEL:
+
+        import psycopg2
+
+        database_url = os.environ.get(
+            "DATABASE_URL",
+            ""
+        ).strip()
+
+        if not database_url:
+
+            raise RuntimeError(
+                "DATABASE_URL is not configured "
+                "in Vercel environment variables."
+            )
+
+        connection = psycopg2.connect(
+            database_url,
+            connect_timeout=10
+        )
+
+        return PostgresConnection(
+            connection
+        )
+
+    # ------------------------------------------
+    # LOCAL: SQLITE
+    # ------------------------------------------
+
+    connection = sqlite3.connect(
         DATABASE,
         timeout=15
     )
 
-    conn.row_factory = sqlite3.Row
+    connection.row_factory = sqlite3.Row
 
-    conn.execute("PRAGMA foreign_keys = ON")
+    connection.execute(
+        "PRAGMA foreign_keys = ON"
+    )
 
-    return conn
+    return connection
 
 
 # ==========================================================
-# CREATE / UPGRADE DATABASE
+# CREATE / VERIFY DATABASE
 # ==========================================================
 
 def create_database():
 
-    conn = get_db_connection()
+    # ------------------------------------------
+    # POSTGRESQL
+    # ------------------------------------------
+
+    if IS_VERCEL:
+
+        # The SQLite-to-Neon migration has already
+        # created and populated these tables.
+        #
+        # Verify that they exist.
+        # Do not recreate or overwrite their data.
+
+        connection = get_db_connection()
+
+        try:
+
+            connection.execute(
+                "SELECT id FROM products LIMIT 0"
+            ).close()
+
+            connection.execute(
+                "SELECT id FROM reviews LIMIT 0"
+            ).close()
+
+            connection.commit()
+
+        except Exception:
+
+            connection.rollback()
+            raise
+
+        finally:
+
+            connection.close()
+
+        return
+
+    # ------------------------------------------
+    # SQLITE
+    # ------------------------------------------
+
+    connection = get_db_connection()
 
     try:
 
-        # ------------------------------------------
-        # PRODUCTS TABLE
-        # ------------------------------------------
-
-        conn.execute("""
+        connection.execute("""
             CREATE TABLE IF NOT EXISTS products (
 
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,10 +287,10 @@ def create_database():
         """)
 
         # ------------------------------------------
-        # SAFELY UPGRADE EXISTING PRODUCTS TABLE
+        # UPGRADE EXISTING PRODUCTS TABLE
         # ------------------------------------------
 
-        columns = conn.execute(
+        columns = connection.execute(
             "PRAGMA table_info(products)"
         ).fetchall()
 
@@ -116,7 +310,7 @@ def create_database():
 
             if name not in column_names:
 
-                conn.execute(
+                connection.execute(
                     f"ALTER TABLE products "
                     f"ADD COLUMN {name} {column_type}"
                 )
@@ -126,10 +320,10 @@ def create_database():
                 )
 
         # ------------------------------------------
-        # NEW: CUSTOMER REVIEWS TABLE
+        # CUSTOMER REVIEWS TABLE
         # ------------------------------------------
 
-        conn.execute("""
+        connection.execute("""
             CREATE TABLE IF NOT EXISTS reviews (
 
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -170,41 +364,41 @@ def create_database():
         # INDEXES
         # ------------------------------------------
 
-        conn.execute("""
+        connection.execute("""
             CREATE INDEX IF NOT EXISTS idx_products_status
             ON products(verification_status)
         """)
 
-        conn.execute("""
+        connection.execute("""
             CREATE INDEX IF NOT EXISTS idx_products_brand
             ON products(brand)
         """)
 
-        conn.execute("""
+        connection.execute("""
             CREATE INDEX IF NOT EXISTS idx_products_category
             ON products(category)
         """)
 
-        conn.execute("""
+        connection.execute("""
             CREATE INDEX IF NOT EXISTS idx_reviews_product
             ON reviews(product_id)
         """)
 
-        conn.execute("""
+        connection.execute("""
             CREATE INDEX IF NOT EXISTS idx_reviews_status
             ON reviews(moderation_status)
         """)
 
-        conn.commit()
+        connection.commit()
 
     except Exception:
 
-        conn.rollback()
+        connection.rollback()
         raise
 
     finally:
 
-        conn.close()
+        connection.close()
 
 
 # ==========================================================
@@ -213,11 +407,11 @@ def create_database():
 
 def get_database_stats():
 
-    conn = get_db_connection()
+    connection = get_db_connection()
 
     try:
 
-        row = conn.execute("""
+        row = connection.execute("""
             SELECT
 
                 COUNT(*) AS total,
@@ -268,7 +462,7 @@ def get_database_stats():
 
     finally:
 
-        conn.close()
+        connection.close()
 
 
 # ==========================================================
@@ -277,11 +471,11 @@ def get_database_stats():
 
 def get_review_stats():
 
-    conn = get_db_connection()
+    connection = get_db_connection()
 
     try:
 
-        row = conn.execute("""
+        row = connection.execute("""
             SELECT
 
                 COUNT(*) AS total,
@@ -317,7 +511,7 @@ def get_review_stats():
 
     finally:
 
-        conn.close()
+        connection.close()
 
 
 # ==========================================================
