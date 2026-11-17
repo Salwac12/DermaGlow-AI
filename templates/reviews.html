@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="author"
+          content="Salwa Choudhari">
+
+    <title>Customer Reviews | DermaGlow AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        body {
+            background: #fffaf7;
+        }
+
+        .reviews-page {
+            max-width: 1150px;
+            margin: auto;
+            padding: 65px 25px;
+            min-height: 100vh;
+        }
+
+        .reviews-heading {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .reviews-heading h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(35px, 5vw, 52px);
+            margin-bottom: 15px;
+        }
+
+        .reviews-heading h1 span {
+            color: #be748b;
+        }
+
+        .reviews-heading p {
+            color: #756b70;
+            line-height: 1.8;
+        }
+
+        .review-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 22px;
+            border: 1px solid #f3e0e5;
+            margin-bottom: 30px;
+        }
+
+        .review-panel h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 27px;
+            margin-bottom: 20px;
+        }
+
+        .review-form {
+            display: grid;
+            gap: 17px;
+        }
+
+        .review-form label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 7px;
+        }
+
+        .review-form input,
+        .review-form select,
+        .review-form textarea {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ead8de;
+            border-radius: 12px;
+            background: #fffaf9;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .review-form textarea {
+            resize: vertical;
+        }
+
+        .review-button {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 12px;
+            background: #be748b;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .review-button:hover {
+            background: #a65f77;
+        }
+
+        .rating-summary {
+            text-align: center;
+            padding: 25px;
+            background: #fff0f3;
+            border-radius: 18px;
+            margin-bottom: 30px;
+        }
+
+        .rating-number {
+            font-size: 42px;
+            font-weight: 700;
+            color: #be748b;
+        }
+
+        .rating-stars {
+            color: #d99755;
+            font-size: 25px;
+            letter-spacing: 4px;
+        }
+
+        .rating-summary p {
+            color: #756b70;
+            margin-top: 8px;
+        }
+
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .review-card {
+            background: white;
+            padding: 25px;
+            border: 1px solid #f3e0e5;
+            border-radius: 20px;
+            overflow-wrap: anywhere;
+        }
+
+        .review-card h3 {
+            margin: 12px 0;
+            font-size: 18px;
+        }
+
+        .review-author {
+            font-weight: 700;
+            color: #be748b;
+            font-size: 13px;
+        }
+
+        .review-date {
+            color: #756b70;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .review-text {
+            color: #756b70;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .empty-reviews {
+            padding: 35px;
+            background: #fff0f3;
+            border-radius: 18px;
+            text-align: center;
+            color: #805f6a;
+        }
+
+        .flash-message {
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            background: #fff0f3;
+            color: #a65f77;
+        }
+
+        .flash-message.success {
+            background: #e9f6ed;
+            color: #31734c;
+        }
+
+        .admin-review-card {
+            margin-bottom: 15px;
+            padding: 20px;
+            background: #fffaf9;
+            border: 1px solid #f0dce3;
+            border-radius: 15px;
+        }
+
+        .admin-review-card h3 {
+            margin-bottom: 12px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .admin-actions button {
+            padding: 11px 18px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .approve-review {
+            background: #43875b;
+        }
+
+        .reject-review {
+            background: #bd6671;
+        }
+
+        .admin-notice {
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 16px;
+            background: #fff3e5;
+            color: #865b31;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .honeypot {
+            display: none;
+        }
+
+        @media (max-width: 700px) {
+
+            .reviews-page {
+                padding: 45px 15px;
+            }
+
+            .review-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .review-panel {
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            <a href="{{ url_for('home') }}">
+                DermaGlow<span> AI</span>
+            </a>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+
+            <a href="{{ url_for('skin_analysis') }}">
+                Skin Analysis
+            </a>
+
+            <a href="{{ url_for('products') }}">
+                Explore Products
+            </a>
+        </nav>
+
+        <a href="{{ url_for('products') }}"
+           class="nav-button">
+            Browse Products →
+        </a>
+
+    </header>
+
+
+    <main class="reviews-page">
+
+        <!-- HEADING -->
+
+        <div class="reviews-heading">
+
+            <div class="badge">
+                ⭐ COMMUNITY EXPERIENCES
+            </div>
+
+            <h1>
+                Customer <span>Reviews & Ratings.</span>
+            </h1>
+
+            <p>
+                Share your skincare product experience
+                and read reviews submitted by the community.
+            </p>
+
+        </div>
+
+
+        <!-- MESSAGES -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div class="flash-message {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+
+        <!-- SELECT PRODUCT -->
+
+        <section class="review-panel">
+
+            <h2>🧴 Choose a Product</h2>
+
+            <form method="GET"
+                  action="{{ url_for('reviews.review_page') }}"
+                  class="review-form">
+
+                <div>
+
+                    <label for="product_id">
+                        Select Skincare Product
+                    </label>
+
+                    <select id="product_id"
+                            name="product_id"
+                            required>
+
+                        <option value="">
+                            Choose a product...
+                        </option>
+
+                        {% for product in products %}
+
+                        <option value="{{ product.id }}"
+                            {% if selected_product and selected_product.id == product.id %}
+                                selected
+                            {% endif %}>
+
+                            {{ product.brand or "Unknown Brand" }}
+                            — {{ product.product_name }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+                <button type="submit"
+                        class="review-button">
+                    View Product Reviews →
+                </button>
+
+            </form>
+
+            <p style="margin-top:15px;color:#756b70;font-size:12px;">
+                The dropdown shows up to 200 approved products.
+                Additional approved products can be opened
+                directly using their product ID.
+            </p>
+
+        </section>
+
+
+        {% if selected_product %}
+
+        <!-- SELECTED PRODUCT -->
+
+        <section class="review-panel">
+
+            <h2>{{ selected_product.product_name }}</h2>
+
+            <p style="color:#be748b;font-weight:700;">
+                {{ selected_product.brand or "Unknown Brand" }}
+            </p>
+
+            <p style="color:#756b70;margin-top:10px;">
+                {{ selected_product.category or "Skincare" }}
+            </p>
+
+        </section>
+
+
+        <!-- RATING SUMMARY -->
+
+        <section class="rating-summary">
+
+            {% if average_rating is not none %}
+
+            <div class="rating-number">
+                {{ "%.1f"|format(average_rating) }}/5
+            </div>
+
+            <div class="rating-stars">
+                ★★★★★
+            </div>
+
+            <p>
+                Average rating from
+                {{ review_count }} approved customer reviews.
+            </p>
+
+            {% else %}
+
+            <div class="rating-number">
+                No Ratings Yet
+            </div>
+
+            <p>
+                Be the first to share your experience.
+            </p>
+
+            {% endif %}
+
+        </section>
+
+
+        <!-- WRITE A REVIEW -->
+
+        <section class="review-panel">
+
+            <h2>✍️ Write a Review</h2>
+
+            <form method="POST"
+                  action="{{ url_for('reviews.submit_review') }}"
+                  class="review-form">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <input type="hidden"
+                       name="product_id"
+                       value="{{ selected_product.id }}">
+
+                <!-- HONEYPOT -->
+
+                <div class="honeypot"
+                     aria-hidden="true">
+
+                    <label for="website">
+                        Website
+                    </label>
+
+                    <input type="text"
+                           id="website"
+                           name="website"
+                           tabindex="-1"
+                           autocomplete="off">
+
+                </div>
+
+
+                <!-- NAME -->
+
+                <div>
+
+                    <label for="reviewer_name">
+                        Display Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="reviewer_name"
+                        name="reviewer_name"
+                        minlength="2"
+                        maxlength="50"
+                        placeholder="Your name or nickname"
+                        required>
+
+                </div>
+
+
+                <!-- RATING -->
+
+                <div>
+
+                    <label for="rating">
+                        Your Rating
+                    </label>
+
+                    <select id="rating"
+                            name="rating"
+                            required>
+
+                        <option value="">
+                            Select your rating...
+                        </option>
+
+                        <option value="5">
+                            ★★★★★ — Excellent
+                        </option>
+
+                        <option value="4">
+                            ★★★★☆ — Good
+                        </option>
+
+                        <option value="3">
+                            ★★★☆☆ — Average
+                        </option>
+
+                        <option value="2">
+                            ★★☆☆☆ — Poor
+                        </option>
+
+                        <option value="1">
+                            ★☆☆☆☆ — Very Poor
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- REVIEW TITLE -->
+
+                <div>
+
+                    <label for="review_title">
+                        Review Title
+                    </label>
+
+                    <input
+                        type="text"
+                        id="review_title"
+                        name="review_title"
+                        minlength="3"
+                        maxlength="100"
+                        placeholder="Summarize your experience"
+                        required>
+
+                </div>
+
+
+                <!-- REVIEW TEXT -->
+
+                <div>
+
+                    <label for="review_text">
+                        Your Experience
+                    </label>
+
+                    <textarea
+                        id="review_text"
+                        name="review_text"
+                        rows="5"
+                        minlength="15"
+                        maxlength="2000"
+                        placeholder="What did you like or dislike about this product?"
+                        required></textarea>
+
+                </div>
+
+                <p style="font-size:12px;color:#756b70;">
+                    Please share only your genuine experience.
+                    Avoid including private contact details.
+                    Reviews are moderated before publication.
+                </p>
+
+                <button type="submit"
+                        class="review-button">
+                    Submit My Review ⭐
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <!-- CUSTOMER REVIEWS -->
+
+        <section class="review-panel">
+
+            <h2>
+                ⭐ Customer Experiences
+            </h2>
+
+            {% if approved_reviews %}
+
+            <div class="review-grid">
+
+                {% for review in approved_reviews %}
+
+                <article class="review-card">
+
+                    <div class="rating-stars">
+
+                        {% for star in range(review.rating) %}
+                            ★
+                        {% endfor %}
+
+                        {% for star in range(5 - review.rating) %}
+                            ☆
+                        {% endfor %}
+
+                    </div>
+
+                    <h3>{{ review.review_title }}</h3>
+
+                    <div class="review-author">
+                        {{ review.reviewer_name }}
+                    </div>
+
+                    <div class="review-date">
+                        {{ review.created_at[:10] }}
+                    </div>
+
+                    <p class="review-text">
+                        {{ review.review_text }}
+                    </p>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+            {% else %}
+
+            <div class="empty-reviews">
+                No approved reviews yet.
+                Customer experiences will appear here
+                after moderation.
+            </div>
+
+            {% endif %}
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- ADMIN MODERATION -->
+
+        {% if is_admin %}
+
+        <section class="review-panel">
+
+            <h2>🔐 Admin Review Moderation</h2>
+
+            <div class="admin-notice">
+                Pending reviews are visible only to
+                the authenticated administrator.
+
+                Approve genuine, appropriate submissions.
+                Reject spam and unsuitable content.
+            </div>
+
+            <p style="margin-bottom:20px;color:#756b70;">
+                Pending: {{ review_stats.pending }}
+                | Approved: {{ review_stats.approved }}
+                | Rejected: {{ review_stats.rejected }}
+            </p>
+
+            {% if pending_reviews %}
+
+                {% for review in pending_reviews %}
+
+                <article class="admin-review-card">
+
+                    <h3>{{ review.product_name }}</h3>
+
+                    <p>
+                        <strong>Reviewer:</strong>
+                        {{ review.reviewer_name }}
+                    </p>
+
+                    <p>
+                        <strong>Rating:</strong>
+                        {{ review.rating }}/5
+                    </p>
+
+                    <p>
+                        <strong>Title:</strong>
+                        {{ review.review_title }}
+                    </p>
+
+                    <p class="review-text">
+                        {{ review.review_text }}
+                    </p>
+
+                    <div class="admin-actions">
+
+                        <form method="POST"
+                              action="{{ url_for('reviews.moderate_review', review_id=review.id) }}">
+
+                            <input type="hidden"
+                                   name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <input type="hidden"
+                                   name="new_status"
+                                   value="approved">
+
+                            <button type="submit"
+                                    class="approve-review">
+                                ✓ Approve Review
+                            </button>
+
+                        </form>
+
+                        <form method="POST"
+                              action="{{ url_for('reviews.moderate_review', review_id=review.id) }}">
+
+                            <input type="hidden"
+                                   name="csrf_token"
+                                   value="{{ csrf_token() }}">
+
+                            <input type="hidden"
+                                   name="new_status"
+                                   value="rejected">
+
+                            <button type="submit"
+                                    class="reject-review">
+                                ✕ Reject Review
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-reviews">
+                    No pending reviews.
+                </div>
+
+            {% endif %}
+
+        </section>
+
+        {% endif %}
+
+
+        <div class="admin-notice">
+
+            <strong>Review Information:</strong>
+
+            These ratings are submitted by website visitors.
+            DermaGlow AI does not currently verify purchases
+            or independently confirm review claims.
+
+            Reviews reflect individual experiences and
+            should not be treated as medical advice.
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-logo">
+            DermaGlow AI 🌸
+        </div>
+
+        <p>Your Glow. Your Journey.</p>
+
+        <p class="developer-credit">
+            Designed & Developed by
+            <span>Salwa Choudhari</span>
+        </p>
+
+        <small>
+            © 2026 DermaGlow AI. All Rights Reserved.
+        </small>
+
+    </footer>
+
+</body>
+
+</html>

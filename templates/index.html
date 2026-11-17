@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="author" content="Salwa Choudhari">
+
+    <meta name="description"
+          content="DermaGlow AI - Personalized skincare discovery and recommendations for India.">
+
+    <title>DermaGlow AI | Personalized Skincare</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        /* ==========================================
+           STICKY NAVIGATION
+        ========================================== */
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 110px;
+        }
+
+        .navbar {
+            position: relative;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 250, 247, 0.98);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 18px rgba(60, 35, 45, 0.06);
+        }
+
+        .navbar .desktop-nav {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        /* ==========================================
+           HAMBURGER BUTTON
+        ========================================== */
+
+        .menu-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border: 1px solid #e8c5d0;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #a65f77;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .menu-toggle:hover {
+            background: #fff0f3;
+        }
+
+        /* ==========================================
+           MOBILE MENU
+        ========================================== */
+
+        .mobile-nav {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            padding: 16px 6% 25px;
+            background: #fffaf7;
+            border-top: 1px solid #f1dfe4;
+            border-bottom: 1px solid #f1dfe4;
+            box-shadow: 0 15px 25px rgba(50, 30, 40, 0.08);
+        }
+
+        .mobile-nav.is-open {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .mobile-nav a {
+            display: block;
+            padding: 13px 15px;
+            border-radius: 10px;
+            color: #352b32;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .mobile-nav a:hover,
+        .mobile-nav a:focus-visible {
+            background: #fff0f3;
+            color: #be748b;
+        }
+
+        @media (max-width: 1000px) {
+
+            .navbar .desktop-nav {
+                display: none;
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .navbar {
+                padding: 16px 5%;
+            }
+
+            .navbar .logo {
+                font-size: 20px;
+            }
+
+            .navbar-actions > .nav-button {
+                display: none;
+            }
+
+            .menu-toggle {
+                width: 42px;
+                height: 42px;
+            }
+
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            html {
+                scroll-behavior: auto;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ==========================================
+         NAVIGATION BAR
+    ========================================== -->
+
+    <header class="navbar">
+
+        <div class="logo">
+
+            <a href="{{ url_for('home') }}">
+                DermaGlow<span> AI</span>
+            </a>
+
+        </div>
+
+        <!-- DESKTOP NAVIGATION -->
+
+        <nav class="desktop-nav"
+             aria-label="Main navigation">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('skin_analysis') }}">
+                Skin Analysis
+            </a>
+
+            <a href="{{ url_for('products') }}">
+                Explore Products
+            </a>
+
+            <a href="#features">
+                Features
+            </a>
+
+            <a href="#about">
+                About
+            </a>
+
+            <a href="#developer">
+                Developer
+            </a>
+
+        </nav>
+
+        <!-- RIGHT SIDE BUTTONS -->
+
+        <div class="navbar-actions">
+
+            <a href="{{ url_for('skin_analysis') }}"
+               class="nav-button">
+                Get Started →
+            </a>
+
+            <button
+                type="button"
+                class="menu-toggle"
+                id="menuToggle"
+                aria-label="Open navigation menu"
+                aria-expanded="false"
+                aria-controls="mobileNav">
+
+                ☰
+
+            </button>
+
+        </div>
+
+        <!-- MOBILE NAVIGATION -->
+
+        <nav class="mobile-nav"
+             id="mobileNav"
+             aria-label="Mobile navigation"
+             hidden>
+
+            <a href="{{ url_for('home') }}">
+                🏠 Home
+            </a>
+
+            <a href="{{ url_for('skin_analysis') }}">
+                🌸 Skin Analysis
+            </a>
+
+            <a href="{{ url_for('products') }}">
+                🧴 Explore Products
+            </a>
+
+            <a href="#features">
+                ✨ Features
+            </a>
+
+            <a href="#about">
+                💗 About
+            </a>
+
+            <a href="#developer">
+                💻 Developer
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <main>
+
+        <!-- ======================================
+             HERO SECTION
+        ====================================== -->
+
+        <section class="hero" id="home">
+
+            <div class="hero-content">
+
+                <div class="badge">
+                    ✨ YOUR PERSONAL SKINCARE COMPANION
+                </div>
+
+                <h1>
+                    Discover Your Skin's
+                    <span>Natural Glow.</span>
+                </h1>
+
+                <p>
+                    Explore skincare products, understand
+                    available ingredient information, and
+                    discover personalized product suggestions
+                    based on your skin type, concerns,
+                    and preferences.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="{{ url_for('skin_analysis') }}"
+                       class="primary-btn">
+                        🌸 Analyze My Skin →
+                    </a>
+
+                    <a href="{{ url_for('products') }}"
+                       class="secondary-btn">
+                        🧴 Explore Skincare Products
+                    </a>
+
+                </div>
+
+                <p class="hero-note">
+                    🌸 Made for your skin. Made for you.
+                </p>
+
+            </div>
+
+
+            <div class="hero-visual">
+
+                <div class="visual-circle">
+
+                    <div class="visual-content">
+
+                        <div class="sparkle">✦</div>
+
+                        <h2>
+                            Glow<br>
+                            With<br>
+                            Confidence
+                        </h2>
+
+                        <div class="sparkle">✧</div>
+
+                    </div>
+
+                </div>
+
+                <div class="floating-card card-one">
+                    ✨ Personalized Skincare
+                </div>
+
+                <div class="floating-card card-two">
+                    🌿 Discover Your Essentials
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             FEATURES SECTION
+        ====================================== -->
+
+        <section class="features" id="features">
+
+            <div class="section-heading">
+
+                <div class="section-tag">
+                    DISCOVER DERMAGLOW
+                </div>
+
+                <h2>
+                    Skincare That Understands You
+                </h2>
+
+                <p>
+                    Explore a simpler, smarter, and more
+                    personalized approach to skincare.
+                </p>
+
+            </div>
+
+            <div class="feature-grid">
+
+                <!-- FEATURE 1 -->
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">📸</div>
+
+                    <h3>Skin Analysis</h3>
+
+                    <p>
+                        Tell us about your skin type,
+                        concerns, sensitivity, and preferences
+                        to create your skincare profile.
+                    </p>
+
+                    <a href="{{ url_for('skin_analysis') }}"
+                       class="feature-link">
+                        Start Skin Analysis →
+                    </a>
+
+                </div>
+
+
+                <!-- FEATURE 2 -->
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">🧴</div>
+
+                    <h3>Product Discovery</h3>
+
+                    <p>
+                        Browse skincare product records.
+                        Search by name, brand, category,
+                        or available ingredient information.
+                    </p>
+
+                    <a href="{{ url_for('products') }}"
+                       class="feature-link">
+                        Explore Products →
+                    </a>
+
+                </div>
+
+
+                <!-- FEATURE 3 -->
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">✨</div>
+
+                    <h3>Personalized Recommendations</h3>
+
+                    <p>
+                        Discover product suggestions from
+                        the approved catalog based on your
+                        selected preferences.
+                    </p>
+
+                    <a href="{{ url_for('skin_analysis') }}"
+                       class="feature-link">
+                        Find My Products →
+                    </a>
+
+                </div>
+
+
+                <!-- FEATURE 4 -->
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">☀️</div>
+
+                    <h3>Skincare Routine Builder</h3>
+
+                    <p>
+                        Generate a simple morning and
+                        nighttime skincare routine based
+                        on your selected product categories.
+                    </p>
+
+                    <a href="{{ url_for('skin_analysis') }}"
+                       class="feature-link">
+                        Build My Routine →
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             HOW IT WORKS
+        ====================================== -->
+
+        <section class="features"
+                 id="how-it-works"
+                 style="background:#fffaf7;">
+
+            <div class="section-heading">
+
+                <div class="section-tag">
+                    YOUR SKINCARE JOURNEY
+                </div>
+
+                <h2>Your Glow Starts Here</h2>
+
+                <p>
+                    Discover your skincare preferences
+                    in three simple steps.
+                </p>
+
+            </div>
+
+            <div class="feature-grid">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">🌸</div>
+
+                    <h3>01. Share Your Preferences</h3>
+
+                    <p>
+                        Complete the skincare questionnaire
+                        with your skin type, concerns,
+                        sensitivity, and budget.
+                    </p>
+
+                </div>
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">✨</div>
+
+                    <h3>02. Explore Suggestions</h3>
+
+                    <p>
+                        View product suggestions based on
+                        approved catalog records and
+                        available ingredient information.
+                    </p>
+
+                </div>
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">🌞</div>
+
+                    <h3>03. View Your Routine</h3>
+
+                    <p>
+                        Explore morning and nighttime
+                        routine steps with suggested
+                        products when available.
+                    </p>
+
+                </div>
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">💗</div>
+
+                    <h3>Discover With Confidence</h3>
+
+                    <p>
+                        Review original product sources
+                        and check the latest ingredient
+                        labels before using new products.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div style="text-align:center;margin-top:45px;">
+
+                <a href="{{ url_for('skin_analysis') }}"
+                   class="primary-btn">
+                    Start My Skincare Journey →
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             ABOUT SECTION
+        ====================================== -->
+
+        <section class="about" id="about">
+
+            <div class="about-content">
+
+                <div class="section-tag">
+                    OUR PURPOSE
+                </div>
+
+                <h2>
+                    A Little More Care.<br>
+                    A Lot More Confidence.
+                </h2>
+
+                <p>
+                    DermaGlow AI is a skincare discovery
+                    platform designed to help users in India
+                    explore product information and organize
+                    their skincare preferences.
+                </p>
+
+                <p>
+                    Choosing skincare products can be
+                    confusing. Our goal is to make
+                    product discovery simpler through
+                    questionnaires, ingredient information,
+                    and personalized product shortlists.
+                </p>
+
+
+                <!-- DEVELOPER SECTION -->
+
+                <div class="developer-section" id="developer">
+
+                    <p class="developer-label">
+                        MEET THE DEVELOPER
+                    </p>
+
+                    <h3>Salwa Choudhari</h3>
+
+                    <p>
+                        Developer of DermaGlow AI,
+                        a skincare recommendation platform
+                        focused on making product discovery
+                        easier and more accessible.
+                    </p>
+
+                    <div class="developer-badge">
+                        💻 Python Developer & Web Development
+                    </div>
+
+                </div>
+
+
+                <div class="disclaimer">
+
+                    <strong>Important:</strong>
+
+                    DermaGlow AI provides general cosmetic
+                    product discovery and skincare information.
+
+                    Product recommendations are based on
+                    available catalog data and are not medical
+                    diagnoses or treatment recommendations.
+
+                    Product information may be incomplete.
+                    Always check the latest product label.
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ==========================================
+         FOOTER
+    ========================================== -->
+
+    <footer>
+
+        <div class="footer-logo">
+            DermaGlow AI 🌸
+        </div>
+
+        <p>Your Glow. Your Journey.</p>
+
+        <div class="footer-links">
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('skin_analysis') }}">
+                Skin Analysis
+            </a>
+
+            <a href="{{ url_for('products') }}">
+                Explore Products
+            </a>
+
+            <a href="#about">
+                About
+            </a>
+
+        </div>
+
+        <p class="developer-credit">
+            Designed & Developed by
+            <span>Salwa Choudhari</span>
+        </p>
+
+        <small>
+            © 2026 DermaGlow AI. All Rights Reserved.
+        </small>
+
+    </footer>
+
+
+    <!-- ==========================================
+         MOBILE MENU JAVASCRIPT
+    ========================================== -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const menuButton = document.getElementById("menuToggle");
+            const mobileMenu = document.getElementById("mobileNav");
+
+            function closeMenu() {
+
+                mobileMenu.hidden = true;
+                mobileMenu.classList.remove("is-open");
+
+                menuButton.setAttribute(
+                    "aria-expanded",
+                    "false"
+                );
+
+                menuButton.setAttribute(
+                    "aria-label",
+                    "Open navigation menu"
+                );
+
+                menuButton.textContent = "☰";
+
+            }
+
+            function openMenu() {
+
+                mobileMenu.hidden = false;
+                mobileMenu.classList.add("is-open");
+
+                menuButton.setAttribute(
+                    "aria-expanded",
+                    "true"
+                );
+
+                menuButton.setAttribute(
+                    "aria-label",
+                    "Close navigation menu"
+                );
+
+                menuButton.textContent = "✕";
+
+            }
+
+            menuButton.addEventListener("click", function () {
+
+                if (menuButton.getAttribute("aria-expanded") === "true") {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
+
+            });
+
+            mobileMenu.querySelectorAll("a").forEach(function (link) {
+
+                link.addEventListener("click", closeMenu);
+
+            });
+
+            document.addEventListener("keydown", function (event) {
+
+                if (event.key === "Escape") {
+                    closeMenu();
+                }
+
+            });
+
+            document.addEventListener("click", function (event) {
+
+                if (
+                    !event.target.closest(".navbar") &&
+                    !mobileMenu.hidden
+                ) {
+                    closeMenu();
+                }
+
+            });
+
+            window.addEventListener("resize", function () {
+
+                if (window.innerWidth > 1000) {
+                    closeMenu();
+                }
+
+            });
+
+        });
+
+    </script>
+
+</body>
+
+</html>

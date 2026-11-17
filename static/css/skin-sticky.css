@@ -1,0 +1,9 @@
+﻿/* Desktop-only sticky navigation on Skin Analysis */
+@media screen and (min-width: 1024px) {
+    body:has(#skinForm) > .navbar {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 9999 !important;
+        box-shadow: 0 4px 18px rgba(60, 35, 45, 0.06);
+    }
+}

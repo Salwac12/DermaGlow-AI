@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+          content="Discover your skincare profile with DermaGlow AI. Developed by Salwa Choudhari.">
+
+    <meta name="author"
+          content="Salwa Choudhari">
+
+    <title>Skin Analysis | DermaGlow AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/skin-sticky.css') }}">
+</head>
+
+<body>
+
+    <!-- NAVIGATION -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            <a href="{{ url_for('home') }}">
+                DermaGlow<span> AI</span>
+            </a>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('home') }}">Home</a>
+
+            <a href="{{ url_for('home') }}#features">
+                Features
+            </a>
+
+            <a href="{{ url_for('home') }}#developer">
+                Developer
+            </a>
+        </nav>
+
+        <a href="{{ url_for('home') }}"
+           class="nav-button">
+            Back to Home
+        </a>
+
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="analysis-page">
+
+        <section class="analysis-intro">
+
+            <div class="badge">
+                ✨ PERSONALIZED SKINCARE EXPERIENCE
+            </div>
+
+            <h1>
+                Let's Get to Know
+                <span>Your Skin.</span>
+            </h1>
+
+            <p>
+                Every skin journey is different.
+                Tell us about your skin, concerns,
+                and skincare preferences.
+            </p>
+
+            <div class="analysis-progress">
+                <div class="progress-fill"></div>
+            </div>
+
+            <p class="progress-text">
+                Step 1 of your personalized skincare journey
+            </p>
+
+        </section>
+
+
+        <!-- QUESTIONNAIRE -->
+
+        <section class="questionnaire-section">
+
+            <form id="skinForm">
+
+                <!-- SKIN TYPE -->
+
+                <div class="question-card">
+
+                    <div class="question-number">
+                        QUESTION 01
+                    </div>
+
+                    <h2>What's Your Skin Type?</h2>
+
+                    <p>
+                        Choose the option that best describes
+                        how your skin usually feels.
+                    </p>
+
+                    <div class="option-grid">
+
+                        <label class="option-card">
+
+                            <input type="radio"
+                                   name="skin_type"
+                                   value="Oily"
+                                   required>
+
+                            <span class="option-emoji">💧</span>
+
+                            <strong>Oily</strong>
+
+                            <small>
+                                Shiny or greasy throughout the day
+                            </small>
+
+                        </label>
+
+
+                        <label class="option-card">
+
+                            <input type="radio"
+                                   name="skin_type"
+                                   value="Dry">
+
+                            <span class="option-emoji">🌾</span>
+
+                            <strong>Dry</strong>
+
+                            <small>
+                                Often feels tight or flaky
+                            </small>
+
+                        </label>
+
+
+                        <label class="option-card">
+
+                            <input type="radio"
+                                   name="skin_type"
+                                   value="Combination">
+
+                            <span class="option-emoji">🌿</span>
+
+                            <strong>Combination</strong>
+
+                            <small>
+                                Oily in some areas, dry in others
+                            </small>
+
+                        </label>
+
+
+                        <label class="option-card">
+
+                            <input type="radio"
+                                   name="skin_type"
+                                   value="Normal">
+
+                            <span class="option-emoji">🌸</span>
+
+                            <strong>Normal</strong>
+
+                            <small>
+                                Generally feels comfortable
+                            </small>
+
+                        </label>
+
+                    </div>
+
+                    <p class="option-help">
+                        Not sure? Choose “Not Sure” below.
+                    </p>
+
+                    <label class="simple-option">
+
+                        <input type="radio"
+                               name="skin_type"
+                               value="Not Sure">
+
+                        I'm not sure about my skin type.
+
+                    </label>
+
+                </div>
+
+
+                <!-- SKIN CONCERNS -->
+
+                <div class="question-card">
+
+                    <div class="question-number">
+                        QUESTION 02
+                    </div>
+
+                    <h2>What Are Your Skin Concerns?</h2>
+
+                    <p>
+                        Select all that apply to you.
+                    </p>
+
+                    <div class="concern-grid">
+
+                        <label class="checkbox-card">
+                            <input type="checkbox"
+                                   name="concerns"
+                                   value="Acne">
+                            <span>🌸 Acne / Breakouts</span>
+                        </label>
+
+                        <label class="checkbox-card">
+                            <input type="checkbox"
+                                   name="concerns"
+                                   value="Dark Spots">
+                            <span>✨ Dark Spots</span>
+                        </label>
+
+                        <label class="checkbox-card">
+                            <input type="checkbox"
+                                   name="concerns"
+                                   value="Dryness">
+                            <span>💧 Dryness</span>
+                        </label>
+
+                        <label class="checkbox-card">
+                            <input type="checkbox"
+                                   name="concerns"
+                                   value="Excess Oil">
+                            <span>🌿 Excess Oil</span>
+                        </label>
+
+                        <label class="checkbox-card">
+                            <input type="checkbox"
+                                   name="concerns"
+                                   value="Uneven Skin Tone">
+                            <span>🌷 Uneven Skin Tone</span>
+                        </label>
+
+                        <label class="checkbox-card">
+                            <input type="checkbox"
+                                   name="concerns"
+                                   value="Fine Lines">
+                            <span>☀️ Fine Lines</span>
+                        </label>
+
+                        <label class="checkbox-card">
+                            <input type="checkbox"
+                                   name="concerns"
+                                   value="Dullness">
+                            <span>⭐ Dullness</span>
+                        </label>
+
+                        <label class="checkbox-card">
+                            <input type="checkbox"
+                                   name="concerns"
+                                   value="Redness">
+                            <span>🍃 Redness</span>
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SENSITIVITY -->
+
+                <div class="question-card">
+
+                    <div class="question-number">
+                        QUESTION 03
+                    </div>
+
+                    <h2>How Sensitive Is Your Skin?</h2>
+
+                    <p>
+                        Does your skin react easily to
+                        new skincare products?
+                    </p>
+
+                    <div class="choice-row">
+
+                        <label class="pill-option">
+
+                            <input type="radio"
+                                   name="sensitivity"
+                                   value="Low"
+                                   required>
+
+                            <span>Low</span>
+
+                        </label>
+
+                        <label class="pill-option">
+
+                            <input type="radio"
+                                   name="sensitivity"
+                                   value="Moderate">
+
+                            <span>Moderate</span>
+
+                        </label>
+
+                        <label class="pill-option">
+
+                            <input type="radio"
+                                   name="sensitivity"
+                                   value="High">
+
+                            <span>High</span>
+
+                        </label>
+
+                        <label class="pill-option">
+
+                            <input type="radio"
+                                   name="sensitivity"
+                                   value="Not Sure">
+
+                            <span>Not Sure</span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BUDGET -->
+
+                <div class="question-card">
+
+                    <div class="question-number">
+                        QUESTION 04
+                    </div>
+
+                    <h2>What's Your Skincare Budget?</h2>
+
+                    <p>
+                        Choose your approximate total budget
+                        for skincare products.
+                    </p>
+
+                    <div class="budget-container">
+
+                        <div class="budget-value">
+                            ₹<span id="budgetAmount">1500</span>
+                        </div>
+
+                        <input type="range"
+                               id="budget"
+                               name="budget"
+                               min="300"
+                               max="5000"
+                               step="100"
+                               value="1500">
+
+                        <div class="range-labels">
+                            <span>₹300</span>
+                            <span>₹5,000</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRODUCT PREFERENCES -->
+
+                <div class="question-card">
+
+                    <div class="question-number">
+                        QUESTION 05
+                    </div>
+
+                    <h2>Which Products Do You Need?</h2>
+
+                    <p>
+                        Choose the skincare products
+                        you're interested in.
+                    </p>
+
+                    <div class="concern-grid">
+
+                        <label class="checkbox-card">
+
+                            <input type="checkbox"
+                                   name="products"
+                                   value="Face Wash">
+
+                            <span>🫧 Face Wash</span>
+
+                        </label>
+
+                        <label class="checkbox-card">
+
+                            <input type="checkbox"
+                                   name="products"
+                                   value="Moisturizer">
+
+                            <span>🧴 Moisturizer</span>
+
+                        </label>
+
+                        <label class="checkbox-card">
+
+                            <input type="checkbox"
+                                   name="products"
+                                   value="Sunscreen">
+
+                            <span>☀️ Sunscreen</span>
+
+                        </label>
+
+                        <label class="checkbox-card">
+
+                            <input type="checkbox"
+                                   name="products"
+                                   value="Serum">
+
+                            <span>✨ Serum</span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ALLERGIES AND PREFERENCES -->
+
+                <div class="question-card">
+
+                    <div class="question-number">
+                        QUESTION 06
+                    </div>
+
+                    <h2>Any Ingredients You Want to Avoid?</h2>
+
+                    <p>
+                        Tell us about known allergies
+                        or preferences so we can consider
+                        them when recommending products.
+                    </p>
+
+                    <label class="field-label"
+                           for="avoidIngredients">
+                        Ingredients or preferences
+                    </label>
+
+                    <textarea
+                        id="avoidIngredients"
+                        name="avoid_ingredients"
+                        maxlength="500"
+                        rows="3"
+                        placeholder="Example: Fragrance, essential oils, or an ingredient that previously irritated my skin"></textarea>
+
+                    <p class="field-note">
+                        Optional. If you have a known allergy,
+                        check full product labels before use.
+                    </p>
+
+                </div>
+
+
+                <!-- SELFIE UPLOAD -->
+
+                <div class="question-card">
+
+                    <div class="question-number">
+                        QUESTION 07 — OPTIONAL
+                    </div>
+
+                    <h2>Would You Like to Add a Selfie?</h2>
+
+                    <p>
+                        You can select a clear photograph
+                        to preview here.
+                        Photo-based observations are not
+                        available in this version yet.
+                    </p>
+
+                    <div class="upload-area">
+
+                        <div class="upload-icon">
+                            📸
+                        </div>
+
+                        <h3>
+                            Add Your Selfie
+                        </h3>
+
+                        <p>
+                            JPG, PNG, or WebP · Maximum 5 MB
+                        </p>
+
+                        <input
+                            type="file"
+                            id="skinImage"
+                            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+
+                        <label
+                            for="skinImage"
+                            class="upload-button">
+                            Choose Photo
+                        </label>
+
+                        <div id="imagePreview"
+                             class="image-preview"
+                             hidden>
+
+                            <img id="previewImg"
+                                 alt="Your selected selfie preview">
+
+                            <button type="button"
+                                    id="removeImage"
+                                    class="remove-image-btn">
+                                Remove Photo
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    <p class="privacy-note">
+                        🔒 Your photo stays in your browser.
+                        It is not uploaded, stored, or analyzed
+                        by our server in this version.
+                    </p>
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <div class="submit-section">
+
+                    <h2>
+                        Ready to Discover Your Skin Profile?
+                    </h2>
+
+                    <p>
+                        Review your answers and see
+                        your personalized skincare profile.
+                    </p>
+
+                    <button type="submit"
+                            class="analysis-submit-btn">
+
+                        View My Skin Profile →
+
+                    </button>
+
+                    <p class="submit-note">
+                        This is a skincare preference questionnaire,
+                        not a medical diagnosis.
+                    </p>
+
+                </div>
+
+            </form>
+
+
+            <!-- RESULTS SUMMARY -->
+
+            <section id="profileResult"
+                     class="profile-result"
+                     hidden>
+
+                <div class="section-tag">
+                    YOUR PERSONALIZED PROFILE
+                </div>
+
+                <h2>
+                    Your Skincare Journey Starts Here 🌸
+                </h2>
+
+                <p class="result-intro">
+                    Here's a summary of the information
+                    you've shared with us.
+                </p>
+
+                <div id="profileDetails"
+                     class="profile-details">
+                </div>
+
+                <div class="profile-next-note">
+                    Product matching and AI photo analysis
+                    will be added in the next development phases.
+                    No products have been evaluated yet.
+                </div>
+
+                <button type="button"
+                        id="editProfile"
+                        class="secondary-btn edit-profile-btn">
+                    Edit My Answers
+                </button>
+
+            </section>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <div class="footer-logo">
+            DermaGlow AI 🌸
+        </div>
+
+        <p>
+            Your Glow. Your Journey.
+        </p>
+
+        <p class="developer-credit">
+            Designed & Developed by
+            <span>Salwa Choudhari</span>
+        </p>
+
+        <small>
+            © 2026 DermaGlow AI. All Rights Reserved.
+        </small>
+
+    </footer>
+
+
+    <script
+        src="{{ url_for('static', filename='js/skin_analysis.js') }}">
+    </script>
+
+</body>
+
+</html>

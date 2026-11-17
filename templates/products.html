@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="author"
+          content="Salwa Choudhari">
+
+    <title>Explore Products | DermaGlow AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        /* ==========================================
+           PAGE DESIGN
+        ========================================== */
+
+        body {
+            background: #fffaf7;
+        }
+
+        .catalog-page {
+            min-height: 100vh;
+            padding: 65px 7%;
+        }
+
+        .catalog-header {
+            max-width: 760px;
+            margin: 0 auto 40px;
+            text-align: center;
+        }
+
+        .catalog-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(36px, 5vw, 54px);
+            line-height: 1.2;
+            margin-bottom: 16px;
+        }
+
+        .catalog-header h1 span {
+            color: #be748b;
+        }
+
+        .catalog-header p {
+            color: #756b70;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+
+        /* ==========================================
+           STATISTICS
+        ========================================== */
+
+        .catalog-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 35px;
+        }
+
+        .catalog-stat {
+            padding: 24px;
+            text-align: center;
+            background: white;
+            border: 1px solid #f3e0e5;
+            border-radius: 20px;
+        }
+
+        .catalog-stat strong {
+            display: block;
+            color: #be748b;
+            font-size: 29px;
+            margin-bottom: 7px;
+        }
+
+        .catalog-stat span {
+            color: #756b70;
+            font-size: 12px;
+        }
+
+
+        /* ==========================================
+           SEARCH AND FILTERS
+        ========================================== */
+
+        .filter-panel {
+            padding: 25px;
+            margin-bottom: 30px;
+            background: white;
+            border: 1px solid #f3e0e5;
+            border-radius: 22px;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 14px;
+            align-items: end;
+        }
+
+        .filter-field label {
+            display: block;
+            margin-bottom: 9px;
+            color: #756b70;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .filter-field input,
+        .filter-field select {
+            width: 100%;
+            height: 47px;
+            padding: 10px 13px;
+            background: #fffaf9;
+            border: 1px solid #ead8de;
+            border-radius: 12px;
+            color: #352b32;
+            font-family: inherit;
+            font-size: 13px;
+        }
+
+        .search-button {
+            height: 47px;
+            padding: 0 24px;
+            background: #be748b;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .search-button:hover {
+            background: #a65f77;
+        }
+
+        .clear-filters {
+            display: inline-block;
+            margin-top: 15px;
+            color: #be748b;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .results-info {
+            margin-bottom: 22px;
+            color: #756b70;
+            font-size: 13px;
+        }
+
+
+        /* ==========================================
+           PRODUCT GRID
+        ========================================== */
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: white;
+            border: 1px solid #f3e0e5;
+            border-radius: 22px;
+            overflow: hidden;
+            transition: transform 0.3s,
+                        box-shadow 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(77, 36, 49, 0.08);
+        }
+
+
+        /* ==========================================
+           PRODUCT IMAGES
+        ========================================== */
+
+        .product-image-container {
+            height: 230px;
+            padding: 20px;
+            background: #fff5f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+        }
+
+        .product-placeholder {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            height: 100%;
+            color: #be748b;
+        }
+
+        .placeholder-icon {
+            font-size: 55px;
+        }
+
+        .placeholder-text {
+            color: #a77e8a;
+            font-size: 12px;
+        }
+
+
+        /* ==========================================
+           PRODUCT INFORMATION
+        ========================================== */
+
+        .product-body {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            padding: 22px;
+            overflow-wrap: anywhere;
+        }
+
+        .product-brand {
+            color: #be748b;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            color: #352b32;
+            font-size: 17px;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .product-category {
+            display: inline-block;
+            align-self: flex-start;
+            padding: 7px 12px;
+            margin-bottom: 15px;
+            border-radius: 20px;
+            background: #fff0f3;
+            color: #a65f77;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .product-details {
+            flex: 1;
+            color: #756b70;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        .product-details p {
+            margin-bottom: 9px;
+        }
+
+
+        /* ==========================================
+           NEW: CUSTOMER STAR RATINGS
+        ========================================== */
+
+        .rating-box {
+            background: #fffaf0;
+            border: 1px solid #f5e5ca;
+            border-radius: 14px;
+            padding: 13px 15px;
+            margin-bottom: 16px;
+        }
+
+        .rating-top {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .rating-stars {
+            color: #d99755;
+            font-size: 19px;
+            letter-spacing: 1px;
+        }
+
+        .rating-value {
+            color: #352b32;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .rating-count {
+            color: #756b70;
+            font-size: 11px;
+        }
+
+        .rating-empty {
+            color: #867880;
+            font-size: 12px;
+        }
+
+
+        /* ==========================================
+           PRODUCT PRICES
+        ========================================== */
+
+        .product-price-box {
+            margin: 14px 0;
+            padding: 15px;
+            background: #fff5f7;
+            border-radius: 14px;
+        }
+
+        .product-price {
+            display: block;
+            color: #a65f77;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .price-label {
+            display: block;
+            color: #756b70;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .price-source {
+            display: inline-block;
+            margin-top: 9px;
+            color: #be748b;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .price-unavailable {
+            color: #867880;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+
+        /* ==========================================
+           PRODUCT ACTIONS
+        ========================================== */
+
+        .product-footer {
+            margin-top: 18px;
+            padding-top: 18px;
+            border-top: 1px solid #f4e5e9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 7px 12px;
+            margin-bottom: 15px;
+            border-radius: 20px;
+            background: #fff0f3;
+            color: #a65f77;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .status-badge.approved {
+            background: #e9f6ed;
+            color: #31734c;
+        }
+
+        .status-badge.rejected {
+            background: #f6eded;
+            color: #a14b4b;
+        }
+
+        .view-product {
+            display: block;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #be748b;
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            transition: background 0.3s;
+        }
+
+        .view-product:hover {
+            background: #a65f77;
+        }
+
+
+        /* ==========================================
+           NEW: REVIEW BUTTON
+        ========================================== */
+
+        .review-product-button {
+            display: block;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e8c5d0;
+            color: #a65f77;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .review-product-button:hover {
+            background: #fff0f3;
+            border-color: #be748b;
+        }
+
+        .reviews-disabled {
+            display: block;
+            padding: 12px;
+            background: #f7f3f4;
+            color: #8b8085;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+
+        /* ==========================================
+           PAGINATION
+        ========================================== */
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 45px;
+        }
+
+        .page-link {
+            padding: 12px 20px;
+            background: white;
+            border: 1px solid #e8c5d0;
+            border-radius: 12px;
+            color: #a65f77;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .page-link:hover {
+            background: #fff0f3;
+        }
+
+        .page-indicator {
+            color: #756b70;
+            font-size: 13px;
+        }
+
+        .empty-results {
+            padding: 60px 20px;
+            background: white;
+            border-radius: 22px;
+            text-align: center;
+        }
+
+
+        /* ==========================================
+           DATA SOURCE
+        ========================================== */
+
+        .source-notice {
+            margin-top: 45px;
+            padding: 24px;
+            background: white;
+            border: 1px solid #f3e0e5;
+            border-radius: 18px;
+            color: #756b70;
+            font-size: 12px;
+            line-height: 1.9;
+        }
+
+        .source-notice a {
+            color: #be748b;
+            font-weight: 700;
+        }
+
+
+        /* ==========================================
+           RESPONSIVENESS
+        ========================================== */
+
+        @media (max-width: 1200px) {
+
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .catalog-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 900px) {
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filter-form {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .catalog-page {
+                padding: 45px 5%;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .catalog-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .catalog-stat {
+                padding: 18px 10px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- ==========================================
+         NAVIGATION BAR
+    ========================================== -->
+
+    <header class="navbar">
+
+        <div class="logo">
+
+            <a href="{{ url_for('home') }}">
+                DermaGlow<span> AI</span>
+            </a>
+
+        </div>
+
+        <nav>
+
+            <a href="{{ url_for('home') }}">
+                Home
+            </a>
+
+            <a href="{{ url_for('skin_analysis') }}">
+                Skin Analysis
+            </a>
+
+            <a href="{{ url_for('products') }}">
+                Explore Products
+            </a>
+
+        </nav>
+
+        <a href="{{ url_for('skin_analysis') }}"
+           class="nav-button">
+
+            Analyze My Skin →
+
+        </a>
+
+    </header>
+
+
+    <!-- ==========================================
+         PRODUCT CATALOG
+    ========================================== -->
+
+    <main class="catalog-page">
+
+        <!-- PAGE HEADING -->
+
+        <section class="catalog-header">
+
+            <div class="badge">
+                🌸 EXPLORE SKINCARE
+            </div>
+
+            <h1>
+
+                Discover Your
+
+                <span>Skincare Essentials.</span>
+
+            </h1>
+
+            <p>
+
+                Explore skincare products, ingredients,
+                photographs, Indian reference prices,
+                and genuine visitor-submitted reviews.
+
+            </p>
+
+        </section>
+
+
+        <!-- ======================================
+             DATABASE STATISTICS
+        ====================================== -->
+
+        <section class="catalog-stats">
+
+            <div class="catalog-stat">
+
+                <strong>{{ stats.total }}</strong>
+
+                <span>Total Products</span>
+
+            </div>
+
+            <div class="catalog-stat">
+
+                <strong>{{ stats.approved }}</strong>
+
+                <span>Approved for Catalog</span>
+
+            </div>
+
+            <div class="catalog-stat">
+
+                <strong>{{ stats.with_images }}</strong>
+
+                <span>With Images</span>
+
+            </div>
+
+            <div class="catalog-stat">
+
+                <strong>{{ stats.with_prices }}</strong>
+
+                <span>With Prices</span>
+
+            </div>
+
+        </section>
+
+
+        <!-- ======================================
+             SEARCH AND FILTERS
+        ====================================== -->
+
+        <section class="filter-panel">
+
+            <form method="GET"
+                  action="{{ url_for('products') }}"
+                  class="filter-form">
+
+                <!-- SEARCH -->
+
+                <div class="filter-field">
+
+                    <label for="search">
+
+                        Search Products
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="search"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="Product, brand, ingredient...">
+
+                </div>
+
+
+                <!-- CATEGORY -->
+
+                <div class="filter-field">
+
+                    <label for="category">
+
+                        Category
+
+                    </label>
+
+                    <select id="category" name="category">
+
+                        <option value="">
+
+                            All Categories
+
+                        </option>
+
+                        {% for item in categories %}
+
+                        <option value="{{ item }}"
+                            {% if category == item %}selected{% endif %}>
+
+                            {{ item }}
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div class="filter-field">
+
+                    <label for="status">
+
+                        Status
+
+                    </label>
+
+                    <select id="status" name="status">
+
+                        <option value="">
+
+                            All Statuses
+
+                        </option>
+
+                        <option value="approved"
+                            {% if status == "approved" %}selected{% endif %}>
+
+                            Approved
+
+                        </option>
+
+                        <option value="pending"
+                            {% if status == "pending" %}selected{% endif %}>
+
+                            Pending
+
+                        </option>
+
+                        <option value="rejected"
+                            {% if status == "rejected" %}selected{% endif %}>
+
+                            Rejected
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button type="submit"
+                        class="search-button">
+
+                    Search
+
+                </button>
+
+            </form>
+
+            <a href="{{ url_for('products') }}"
+               class="clear-filters">
+
+                Clear All Filters
+
+            </a>
+
+        </section>
+
+
+        <!-- ======================================
+             RESULT COUNT
+        ====================================== -->
+
+        <p class="results-info">
+
+            Showing
+
+            <strong>{{ products|length }}</strong>
+
+            of
+
+            <strong>{{ matching_count }}</strong>
+
+            matching products.
+
+        </p>
+
+
+        <!-- ======================================
+             PRODUCT CARDS
+        ====================================== -->
+
+        {% if products %}
+
+        <section class="products-grid">
+
+            {% for product in products %}
+
+            <article class="product-card">
+
+
+                <!-- PRODUCT IMAGE -->
+
+                <div class="product-image-container">
+
+                    {% if product.image_url %}
+
+                    <img
+                        src="{{ product.image_url }}"
+                        alt="{{ product.product_name }}"
+                        class="product-image"
+                        loading="lazy"
+                        referrerpolicy="no-referrer"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;">
+
+                    <div class="product-placeholder" hidden>
+
+                        <span class="placeholder-icon">
+                            🧴
+                        </span>
+
+                        <span class="placeholder-text">
+                            Image unavailable
+                        </span>
+
+                    </div>
+
+                    {% else %}
+
+                    <div class="product-placeholder">
+
+                        <span class="placeholder-icon">
+                            🧴
+                        </span>
+
+                        <span class="placeholder-text">
+                            Image unavailable
+                        </span>
+
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- PRODUCT BODY -->
+
+                <div class="product-body">
+
+
+                    <!-- BRAND -->
+
+                    <div class="product-brand">
+
+                        {{ product.brand or "Unknown Brand" }}
+
+                    </div>
+
+
+                    <!-- NAME -->
+
+                    <h3 class="product-name">
+
+                        {{ product.product_name }}
+
+                    </h3>
+
+
+                    <!-- CATEGORY -->
+
+                    <span class="product-category">
+
+                        {{ product.category or "Skincare" }}
+
+                    </span>
+
+
+                    <!-- ==================================
+                         NEW: CUSTOMER RATING
+                    ================================== -->
+
+                    <div class="rating-box">
+
+                        {% if product.review_count > 0 %}
+
+                        <div class="rating-top">
+
+                            <span class="rating-stars"
+                                  aria-hidden="true">
+
+                                {% set rounded_rating = product.average_rating|round(0, 'common')|int %}
+
+                                {% for star in range(rounded_rating) %}
+                                    ★
+                                {% endfor %}
+
+                                {% for star in range(5 - rounded_rating) %}
+                                    ☆
+                                {% endfor %}
+
+                            </span>
+
+                            <span class="rating-value">
+
+                                {{ "%.1f"|format(product.average_rating) }}/5
+
+                            </span>
+
+                        </div>
+
+                        <span class="rating-count">
+
+                            Based on {{ product.review_count }}
+                            approved visitor review{% if product.review_count != 1 %}s{% endif %}
+
+                        </span>
+
+                        {% else %}
+
+                        <div class="rating-top">
+
+                            <span class="rating-stars"
+                                  aria-hidden="true">
+
+                                ☆☆☆☆☆
+
+                            </span>
+
+                        </div>
+
+                        <span class="rating-empty">
+
+                            No customer ratings yet
+
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- PRODUCT INFORMATION -->
+
+                    <div class="product-details">
+
+                        <p>
+
+                            <strong>Quantity:</strong>
+
+                            {{ product.quantity or "Not listed" }}
+
+                        </p>
+
+                        <p>
+
+                            <strong>Ingredients:</strong>
+
+                            {% if product.ingredients %}
+
+                                {{ product.ingredients[:150] }}
+
+                                {% if product.ingredients|length > 150 %}
+                                    ...
+                                {% endif %}
+
+                            {% else %}
+
+                                Not available
+
+                            {% endif %}
+
+                        </p>
+
+                    </div>
+
+
+                    <!-- ==================================
+                         PRODUCT PRICE
+                    ================================== -->
+
+                    <div class="product-price-box">
+
+                        {% if product.price_inr is not none %}
+
+                        <span class="product-price">
+
+                            ₹{{ "%.2f"|format(product.price_inr) }}
+
+                        </span>
+
+                        <span class="price-label">
+
+                            Reference price checked:
+
+                            {{ product.price_checked_at or "Date unavailable" }}
+
+                        </span>
+
+                        {% if product.price_source_url %}
+
+                        <a href="{{ product.price_source_url }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="price-source">
+
+                            View Price Source →
+
+                        </a>
+
+                        {% endif %}
+
+                        {% else %}
+
+                        <span class="price-unavailable">
+
+                            Price not available
+
+                        </span>
+
+                        <span class="price-label">
+
+                            No dated reference price has been entered.
+
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- ==================================
+                         PRODUCT ACTIONS
+                    ================================== -->
+
+                    <div class="product-footer">
+
+
+                        <!-- STATUS -->
+
+                        <span class="status-badge {{ product.verification_status }}">
+
+                            {{ product.verification_status|title }}
+
+                        </span>
+
+
+                        <!-- ORIGINAL PRODUCT LINK -->
+
+                        <a href="{{ product.source_url }}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="view-product">
+
+                            🧴 View Product Details →
+
+                        </a>
+
+
+                        <!-- NEW: PRODUCT REVIEWS BUTTON -->
+
+                        {% if product.verification_status == "approved" %}
+
+                        <a href="{{ url_for('reviews.review_page', product_id=product.id) }}"
+                           class="review-product-button">
+
+                            ⭐ View Reviews / Write Review →
+
+                        </a>
+
+                        {% else %}
+
+                        <span class="reviews-disabled">
+
+                            Reviews available for approved products
+
+                        </span>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+
+        <!-- ======================================
+             PAGINATION
+        ====================================== -->
+
+        {% if total_pages > 1 %}
+
+        <nav class="pagination"
+             aria-label="Product pagination">
+
+            {% if page > 1 %}
+
+            <a class="page-link"
+               href="{{ url_for('products',
+                                page=page-1,
+                                search=search,
+                                category=category,
+                                status=status) }}">
+
+                ← Previous
+
+            </a>
+
+            {% endif %}
+
+            <span class="page-indicator">
+
+                Page {{ page }} of {{ total_pages }}
+
+            </span>
+
+            {% if page < total_pages %}
+
+            <a class="page-link"
+               href="{{ url_for('products',
+                                page=page+1,
+                                search=search,
+                                category=category,
+                                status=status) }}">
+
+                Next →
+
+            </a>
+
+            {% endif %}
+
+        </nav>
+
+        {% endif %}
+
+
+        {% else %}
+
+        <div class="empty-results">
+
+            <h2>No Products Found 🌸</h2>
+
+            <p>
+                Try another search term or category.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- ======================================
+             IMPORTANT INFORMATION
+        ====================================== -->
+
+        <div class="source-notice">
+
+            <strong>Product Information:</strong>
+
+            Product records and available photographs
+            are sourced from
+
+            <a href="https://world.openbeautyfacts.org/"
+               target="_blank"
+               rel="noopener noreferrer">
+
+                Open Beauty Facts
+
+            </a>
+
+            and its contributors.
+
+            Product data is available under the
+            Open Database License.
+
+            Product photographs may have separate
+            attribution requirements.
+
+            Prices shown are dated reference prices
+            entered by the administrator.
+
+            Ratings are calculated from approved
+            reviews submitted by DermaGlow AI visitors.
+
+            DermaGlow AI does not currently verify
+            purchases or independently confirm
+            customer review claims.
+
+            Administrative product approval does not
+            independently verify product safety,
+            accuracy, or availability in India.
+
+        </div>
+
+    </main>
+
+
+    <!-- ==========================================
+         FOOTER
+    ========================================== -->
+
+    <footer>
+
+        <div class="footer-logo">
+
+            DermaGlow AI 🌸
+
+        </div>
+
+        <p>
+
+            Your Glow. Your Journey.
+
+        </p>
+
+        <p class="developer-credit">
+
+            Designed & Developed by
+
+            <span>Salwa Choudhari</span>
+
+        </p>
+
+        <small>
+
+            © 2026 DermaGlow AI. All Rights Reserved.
+
+        </small>
+
+    </footer>
+
+</body>
+
+</html>

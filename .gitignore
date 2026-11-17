@@ -1,0 +1,52 @@
+# ==========================================
+# DERMAGLOW AI — GITIGNORE
+# Developer: Salwa Choudhari
+# ==========================================
+
+# Python virtual environment
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Local database
+dermaglow.db
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Database backups
+backups/
+
+# Import logs
+logs/
+*.log
+
+# Import lock
+.daily_import.lock
+
+# IDE files
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Test cache
+.pytest_cache/
+.coverage
+htmlcov/

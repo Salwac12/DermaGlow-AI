@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="author"
+          content="Salwa Choudhari">
+
+    <title>Admin Dashboard | DermaGlow AI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+
+        body {
+            background: #fffaf7;
+        }
+
+        .admin-page {
+            min-height: 100vh;
+            padding: 55px 7%;
+        }
+
+        .admin-heading {
+            margin-bottom: 30px;
+        }
+
+        .admin-heading h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(32px, 5vw, 48px);
+        }
+
+        .admin-heading h1 span {
+            color: #be748b;
+        }
+
+        .admin-heading p {
+            color: #756b70;
+            margin-top: 12px;
+            line-height: 1.8;
+        }
+
+        /* LOGIN */
+
+        .login-wrapper {
+            min-height: 75vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            background: white;
+            border: 1px solid #f3e0e5;
+            border-radius: 24px;
+        }
+
+        .login-card h1 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .login-card > p {
+            color: #756b70;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .form-field {
+            margin-bottom: 18px;
+        }
+
+        .form-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .form-field input,
+        .form-field select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ead8de;
+            border-radius: 12px;
+            font-family: inherit;
+        }
+
+        /* BUTTONS */
+
+        .action-button {
+            padding: 12px 18px;
+            background: #be748b;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background: #a65f77;
+        }
+
+        .login-button {
+            width: 100%;
+        }
+
+        .logout-button {
+            padding: 10px 15px;
+            background: white;
+            color: #be748b;
+            border: 1px solid #be748b;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .approve-button {
+            background: #43875b;
+        }
+
+        .reject-button {
+            background: #bd6671;
+        }
+
+        .pending-button {
+            background: #8a7c85;
+        }
+
+        /* NOTIFICATIONS */
+
+        .flash-message {
+            max-width: 1100px;
+            margin: 15px auto;
+            padding: 14px 18px;
+            border-radius: 12px;
+            background: #fff0f3;
+            color: #8d5266;
+        }
+
+        .flash-message.success {
+            background: #eaf7ef;
+            color: #31734c;
+        }
+
+        /* STATISTICS */
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        .admin-stat {
+            text-align: center;
+            background: white;
+            border: 1px solid #f3e0e5;
+            border-radius: 20px;
+            padding: 22px;
+        }
+
+        .admin-stat strong {
+            display: block;
+            color: #be748b;
+            font-size: 29px;
+        }
+
+        .admin-stat span {
+            color: #756b70;
+            font-size: 12px;
+        }
+
+        /* BULK APPROVAL */
+
+        .bulk-panel {
+            background: #fff1f4;
+            border: 1px solid #eac3cf;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .bulk-panel h2 {
+            font-size: 21px;
+            margin-bottom: 10px;
+        }
+
+        .bulk-panel p {
+            color: #756b70;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 18px;
+        }
+
+        .bulk-approve-button {
+            background: #43875b;
+        }
+
+        /* FILTERS */
+
+        .admin-filter-panel {
+            padding: 25px;
+            border: 1px solid #f3e0e5;
+            border-radius: 20px;
+            background: white;
+            margin-bottom: 25px;
+        }
+
+        .admin-filter-form {
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        /* PRODUCT CARDS */
+
+        .admin-products {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .admin-product-card {
+            background: white;
+            border: 1px solid #f3e0e5;
+            border-radius: 20px;
+            padding: 25px;
+            overflow-wrap: anywhere;
+        }
+
+        .admin-brand {
+            color: #be748b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .admin-product-card h3 {
+            font-size: 19px;
+            margin: 12px 0;
+        }
+
+        .admin-product-details {
+            color: #756b70;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .admin-product-details p {
+            margin-bottom: 8px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: #fff0f3;
+            color: #a65f77;
+            border-radius: 20px;
+            padding: 7px 13px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 15px;
+        }
+
+        .status-badge.approved {
+            background: #e9f6ed;
+            color: #31734c;
+        }
+
+        .status-badge.rejected {
+            background: #f6eded;
+            color: #a14b4b;
+        }
+
+        .source-link {
+            display: inline-block;
+            color: #be748b;
+            font-weight: 700;
+            font-size: 13px;
+            margin-top: 15px;
+        }
+
+        .admin-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding-top: 20px;
+            margin-top: 20px;
+            border-top: 1px solid #f3e0e5;
+        }
+
+        /* PRICE EDITOR */
+
+        .price-panel {
+            margin-top: 25px;
+            padding: 20px;
+            background: #fffaf9;
+            border: 1px solid #f0dce3;
+            border-radius: 16px;
+        }
+
+        .price-panel h4 {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .price-note {
+            color: #756b70;
+            font-size: 12px;
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .price-current {
+            color: #31734c;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .price-form {
+            display: grid;
+            gap: 12px;
+        }
+
+        .price-form label {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .price-form input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ead8de;
+            border-radius: 10px;
+            font-family: inherit;
+        }
+
+        .price-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .save-price-button {
+            background: #43875b;
+        }
+
+        .remove-price-button {
+            background: #8a7c85;
+        }
+
+        /* PAGINATION */
+
+        .admin-pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 35px;
+        }
+
+        .admin-pagination a {
+            border: 1px solid #e8c5d0;
+            border-radius: 12px;
+            padding: 12px 20px;
+            color: #a65f77;
+            background: white;
+        }
+
+        .empty-admin {
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 20px;
+        }
+
+        @media (max-width: 1100px) {
+
+            .admin-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+        }
+
+        @media (max-width: 900px) {
+
+            .admin-products {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .admin-page {
+                padding: 40px 5%;
+            }
+
+            .admin-filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .login-card {
+                padding: 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <header class="navbar">
+
+        <div class="logo">
+            <a href="{{ url_for('home') }}">
+                DermaGlow<span> AI</span>
+            </a>
+        </div>
+
+        {% if not login_page %}
+
+        <form method="POST"
+              action="{{ url_for('admin_logout') }}">
+
+            <input type="hidden"
+                   name="csrf_token"
+                   value="{{ csrf_token() }}">
+
+            <button type="submit" class="logout-button">
+                Logout
+            </button>
+
+        </form>
+
+        {% else %}
+
+        <a href="{{ url_for('home') }}"
+           class="nav-button">
+            Home
+        </a>
+
+        {% endif %}
+
+    </header>
+
+
+    <!-- FLASH MESSAGES -->
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% for category, message in messages %}
+
+            <div class="flash-message {{ category }}">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endwith %}
+
+
+    {% if login_page %}
+
+    <!-- ADMIN LOGIN -->
+
+    <main class="login-wrapper">
+
+        <div class="login-card">
+
+            <h1>🔐 Admin Login</h1>
+
+            <p>
+                Sign in to manage products
+                and update Indian product prices.
+            </p>
+
+            <form method="POST"
+                  action="{{ url_for('admin_login') }}">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <div class="form-field">
+
+                    <label for="username">Username</label>
+
+                    <input type="text"
+                           id="username"
+                           name="username"
+                           required
+                           autocomplete="username">
+
+                </div>
+
+                <div class="form-field">
+
+                    <label for="password">Password</label>
+
+                    <input type="password"
+                           id="password"
+                           name="password"
+                           required
+                           autocomplete="current-password">
+
+                </div>
+
+                <button type="submit"
+                        class="action-button login-button">
+                    Login →
+                </button>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    {% else %}
+
+    <!-- ADMIN DASHBOARD -->
+
+    <main class="admin-page">
+
+        <div class="admin-heading">
+
+            <h1>Product <span>Management.</span></h1>
+
+            <p>
+                Manage imported skincare products,
+                approve catalog entries, and
+                record product prices in Indian Rupees.
+            </p>
+
+        </div>
+
+
+        <!-- STATISTICS -->
+
+        <section class="admin-stats">
+
+            <div class="admin-stat">
+                <strong>{{ stats.total }}</strong>
+                <span>Total Products</span>
+            </div>
+
+            <div class="admin-stat">
+                <strong>{{ stats.pending }}</strong>
+                <span>Pending</span>
+            </div>
+
+            <div class="admin-stat">
+                <strong>{{ stats.approved }}</strong>
+                <span>Approved</span>
+            </div>
+
+            <div class="admin-stat">
+                <strong>{{ stats.rejected }}</strong>
+                <span>Rejected</span>
+            </div>
+
+            <div class="admin-stat">
+                <strong>{{ stats.with_prices }}</strong>
+                <span>Prices Added</span>
+            </div>
+
+        </section>
+
+
+        <!-- APPROVE ALL -->
+
+        {% if stats.pending > 0 %}
+
+        <section class="bulk-panel">
+
+            <h2>✅ Approve All Pending Products</h2>
+
+            <p>
+                You currently have
+                <strong>{{ stats.pending }}</strong>
+                pending products.
+
+                Bulk approval makes them eligible
+                for catalog recommendations but
+                does not verify their accuracy or safety.
+            </p>
+
+            <form method="POST"
+                  action="{{ url_for('approve_all_products') }}"
+                  onsubmit="return confirm('Approve all pending product records without individual verification?');">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <input type="hidden"
+                       name="confirmation"
+                       value="APPROVE_ALL">
+
+                <button type="submit"
+                        class="action-button bulk-approve-button">
+                    ✓ Approve All {{ stats.pending }} Products
+                </button>
+
+            </form>
+
+        </section>
+
+        {% endif %}
+
+
+        <!-- SEARCH -->
+
+        <section class="admin-filter-panel">
+
+            <form method="GET"
+                  action="{{ url_for('admin_dashboard') }}"
+                  class="admin-filter-form">
+
+                <div class="form-field">
+
+                    <label for="search">
+                        Search Products
+                    </label>
+
+                    <input type="text"
+                           id="search"
+                           name="search"
+                           value="{{ search }}"
+                           placeholder="Product, brand, barcode...">
+
+                </div>
+
+                <div class="form-field">
+
+                    <label for="status">
+                        Status
+                    </label>
+
+                    <select id="status" name="status">
+
+                        <option value=""
+                            {% if status == "" %}selected{% endif %}>
+                            All Products
+                        </option>
+
+                        <option value="pending"
+                            {% if status == "pending" %}selected{% endif %}>
+                            Pending
+                        </option>
+
+                        <option value="approved"
+                            {% if status == "approved" %}selected{% endif %}>
+                            Approved
+                        </option>
+
+                        <option value="rejected"
+                            {% if status == "rejected" %}selected{% endif %}>
+                            Rejected
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button type="submit"
+                        class="action-button">
+                    Search
+                </button>
+
+            </form>
+
+        </section>
+
+
+        <p style="margin-bottom:20px;color:#756b70;">
+            Showing {{ products|length }}
+            of {{ total_matching }} matching products.
+        </p>
+
+
+        <!-- PRODUCT LIST -->
+
+        {% if products %}
+
+        <section class="admin-products">
+
+            {% for product in products %}
+
+            <article class="admin-product-card">
+
+                <div class="admin-brand">
+                    {{ product.brand or "Unknown Brand" }}
+                </div>
+
+                <h3>{{ product.product_name }}</h3>
+
+                <div class="admin-product-details">
+
+                    <p>
+                        <strong>Barcode:</strong>
+                        {{ product.barcode }}
+                    </p>
+
+                    <p>
+                        <strong>Category:</strong>
+                        {{ product.category or "Not available" }}
+                    </p>
+
+                    <p>
+                        <strong>Quantity:</strong>
+                        {{ product.quantity or "Not available" }}
+                    </p>
+
+                    <p>
+                        <strong>Ingredients:</strong>
+
+                        {% if product.ingredients %}
+                            {{ product.ingredients[:300] }}
+                            {% if product.ingredients|length > 300 %}
+                                ...
+                            {% endif %}
+                        {% else %}
+                            Not available
+                        {% endif %}
+                    </p>
+
+                </div>
+
+
+                <!-- PRODUCT STATUS -->
+
+                <span class="status-badge {{ product.verification_status }}">
+                    {{ product.verification_status|title }}
+                </span>
+
+                <br>
+
+                <a href="{{ product.source_url }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="source-link">
+
+                    View Original Product →
+
+                </a>
+
+
+                <!-- APPROVE / REJECT / RESET -->
+
+                <div class="admin-actions">
+
+                    {% if product.verification_status != "approved" %}
+
+                    <form method="POST"
+                          action="{{ url_for('update_product_status', product_id=product.id) }}">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <input type="hidden"
+                               name="new_status"
+                               value="approved">
+
+                        <button class="action-button approve-button"
+                                type="submit">
+                            ✓ Approve
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+
+                    {% if product.verification_status != "rejected" %}
+
+                    <form method="POST"
+                          action="{{ url_for('update_product_status', product_id=product.id) }}">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <input type="hidden"
+                               name="new_status"
+                               value="rejected">
+
+                        <button class="action-button reject-button"
+                                type="submit">
+                            ✕ Reject
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+
+                    {% if product.verification_status != "pending" %}
+
+                    <form method="POST"
+                          action="{{ url_for('update_product_status', product_id=product.id) }}">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <input type="hidden"
+                               name="new_status"
+                               value="pending">
+
+                        <button class="action-button pending-button"
+                                type="submit">
+                            ↻ Reset
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- NEW: PRICE EDITOR -->
+
+                <section class="price-panel">
+
+                    <h4>💰 Indian Product Price</h4>
+
+                    <p class="price-note">
+                        Enter a price you have checked
+                        from a legitimate source.
+
+                        This is a dated reference price,
+                        not a live shopping price.
+                    </p>
+
+                    {% if product.price_inr is not none %}
+
+                    <div class="price-current">
+
+                        ₹{{ "%.2f"|format(product.price_inr) }}
+
+                    </div>
+
+                    <p class="price-note">
+                        Checked on:
+                        {{ product.price_checked_at or "Unknown" }}
+                    </p>
+
+                    {% else %}
+
+                    <p class="price-note">
+                        No price has been added yet.
+                    </p>
+
+                    {% endif %}
+
+
+                    <form method="POST"
+                          action="{{ url_for('update_product_price', product_id=product.id) }}"
+                          class="price-form">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <input type="hidden"
+                               name="action"
+                               value="save">
+
+                        <label for="price-{{ product.id }}">
+                            Price in ₹
+                        </label>
+
+                        <input
+                            type="number"
+                            id="price-{{ product.id }}"
+                            name="price_inr"
+                            min="0.01"
+                            max="1000000"
+                            step="0.01"
+                            value="{% if product.price_inr is not none %}{{ product.price_inr }}{% endif %}"
+                            placeholder="Example: 499.00"
+                            required>
+
+                        <label for="source-{{ product.id }}">
+                            Price Source URL
+                        </label>
+
+                        <input
+                            type="url"
+                            id="source-{{ product.id }}"
+                            name="price_source_url"
+                            value="{{ product.price_source_url or '' }}"
+                            placeholder="https://example.com/product"
+                            required>
+
+                        <button type="submit"
+                                class="action-button save-price-button">
+                            ✓ Save Price
+                        </button>
+
+                    </form>
+
+
+                    {% if product.price_inr is not none %}
+
+                    <form method="POST"
+                          action="{{ url_for('update_product_price', product_id=product.id) }}"
+                          style="margin-top:10px;"
+                          onsubmit="return confirm('Remove this product price?');">
+
+                        <input type="hidden"
+                               name="csrf_token"
+                               value="{{ csrf_token() }}">
+
+                        <input type="hidden"
+                               name="action"
+                               value="clear">
+
+                        <button type="submit"
+                                class="action-button remove-price-button">
+                            Remove Price
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+                </section>
+
+            </article>
+
+            {% endfor %}
+
+        </section>
+
+
+        <!-- PAGINATION -->
+
+        {% if total_pages > 1 %}
+
+        <nav class="admin-pagination">
+
+            {% if page > 1 %}
+
+            <a href="{{ url_for('admin_dashboard',
+                               page=page-1,
+                               search=search,
+                               status=status) }}">
+                ← Previous
+            </a>
+
+            {% endif %}
+
+            <span>
+                Page {{ page }} of {{ total_pages }}
+            </span>
+
+            {% if page < total_pages %}
+
+            <a href="{{ url_for('admin_dashboard',
+                               page=page+1,
+                               search=search,
+                               status=status) }}">
+                Next →
+            </a>
+
+            {% endif %}
+
+        </nav>
+
+        {% endif %}
+
+
+        {% else %}
+
+        <div class="empty-admin">
+
+            <h2>No Matching Products Found</h2>
+
+            <p>
+                Try another search or status filter.
+            </p>
+
+        </div>
+
+        {% endif %}
+
+    </main>
+
+    {% endif %}
+
+
+    <footer>
+
+        <div class="footer-logo">
+            DermaGlow AI 🌸
+        </div>
+
+        <p>Your Glow. Your Journey.</p>
+
+        <p class="developer-credit">
+            Designed & Developed by
+            <span>Salwa Choudhari</span>
+        </p>
+
+        <small>
+            © 2026 DermaGlow AI. All Rights Reserved.
+        </small>
+
+    </footer>
+
+</body>
+
+</html>
